@@ -29,11 +29,11 @@ jobs:
       - name: Debug directories
         run: |
           echo "binary-search-tree directory contents:"
-          ls -la ${{ github.workspace }}/binary-search-tree
+          ls -la ${{ github.workspace }}/
           echo "Build directory contents:"
-          ls -la ${{ github.workspace }}/binary-search-tree/build || echo "Build directory not found"
+          ls -la ${{ github.workspace }}/build || echo "Build directory not found"
           echo "Build directory structure:"
-          find ${{ github.workspace }}/binary-search-tree/build -type f | sort
+          find ${{ github.workspace }}/build -type f | sort
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
