@@ -46,5 +46,5 @@ jobs:
 
       - name: Upload to S3
         run: |
-            aws s3 rm "s3://${{ secrets.AWS_S3_BUCKET_NAME }}" --recursive
-            aws s3 cp "${{ github.workspace }}/binary-search-tree/build/" "s3://${{ secrets.AWS_S3_BUCKET_NAME }}" --recursive
+            aws s3 rm "s3://${{ secrets.AWS_BUCKET_NAME }}" --recursive
+            aws s3 cp "${{ github.workspace }}/binary-search-tree/build/" "s3://${{ secrets.AWS_BUCKET_NAME }}" --recursive
