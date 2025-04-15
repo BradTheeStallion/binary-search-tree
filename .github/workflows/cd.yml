@@ -19,17 +19,12 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: |
-          ls
-          cd binary-search-tree
-          npm install
+        run: npm install
 
       - name: Build frontend
         env:
           REACT_APP_API_BASE_URL: ${{ secrets.EC2_IP }}
-        run: |
-          cd binary-search-tree
-          CI=false npm run build
+        run: CI=false npm run build
 
       - name: Debug directories
         run: |
