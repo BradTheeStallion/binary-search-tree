@@ -1,0 +1,44 @@
+name: Deploy to EC2
+on:
+  push:
+    branches: [ main ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@main
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          set -e
+          set -x
+          APP_DIR="/home/ec2-user/DataStructuresAlgorithms_FinalSprint"
+          echo "Starting deployment process at $(date)"
+          
+          if [ ! -d "$APP_DIR" ]; then
+            echo "Directory doesn't exist, cloning repository..."
+            REPO_URL="https://BradTheeStallion:${{ secrets.TOKEN }}@github.com/${{ github.repository }}.git"
+            git clone --branch main $REPO_URL "$APP_DIR"
+          fi
+          
+          cd "$APP_DIR"
+          
+          echo "Stopping running containers..."
+          sudo docker-compose down || echo "No containers were running"
+          
+          echo "Pulling latest changes from main branch..."
+          git fetch --all
+          git reset --hard origin/main
+          
+          echo "Building Docker images..."
+          sudo docker-compose build
+          
+          echo "Starting Docker containers..."
+          sudo docker-compose up -d
+          
+          echo "Deployment finished successfully at $(date)"
+          echo "Current running Docker containers:"
+          sudo docker ps
