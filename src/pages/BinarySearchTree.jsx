@@ -17,13 +17,11 @@ const renderTree = (node, prefix = '', isLeft = true) => {
 };
 
 const TreeDisplay = ({ treeData }) => {
-  if (!treeData || !treeData.root) {
+  if (!treeData || !treeData.rootNode) {
     return <p>No tree data available for visualization.</p>;
   }
-
-  console.log("Tree data structure:", treeData);
   
-  const lines = renderTree(treeData.root);
+  const lines = renderTree(treeData.rootNode);
   
   return (
     <pre style={{ fontFamily: 'monospace', lineHeight: '1.5em' }}>
