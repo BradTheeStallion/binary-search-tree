@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const BinarySearchTree = () => {
+  const [name, setName] = useState('');
   const [numbers, setNumbers] = useState('');
   const [currentTree, setCurrentTree] = useState(null);
   const [previousTrees, setPreviousTrees] = useState([]);
@@ -10,6 +11,7 @@ const BinarySearchTree = () => {
   const [showPrevious, setShowPrevious] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [nameError, setNameError] = useState('');
 
   const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -32,12 +34,35 @@ const BinarySearchTree = () => {
     }
   };
 
+  const handleNameChange = (e) => {
+    const inputName = e.target.value;
+    setName(inputName);
+    
+    setNameError('');
+    
+    const unsafeCharRegex = /[<>(){}[\]\\\/^$|?*+]/;
+    if (unsafeCharRegex.test(inputName)) {
+      setNameError('Name contains unsafe special characters');
+    }
+  };
+
   const handleInputChange = (e) => {
     setNumbers(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+   
+    if (!name.trim()) {
+      setError('Please enter a name for the tree');
+      return;
+    }
+    
+    if (nameError) {
+      setError('Please fix the name field errors before submitting');
+      return;
+    }
+    
     try {
       setLoading(true);
       setError('');
@@ -52,9 +77,12 @@ const BinarySearchTree = () => {
         throw new Error('Please enter valid numbers separated by commas');
       }
 
-      const response = await axios.post(API_URL, {
-        numbers: numberArray,
-      });
+      const payload = {
+        name: name,
+        values: numberArray
+      };
+
+      const response = await axios.post(API_URL, payload);
 
       setCurrentTree(response.data);
       setLoading(false);
@@ -160,7 +188,10 @@ const BinarySearchTree = () => {
         <h3>Binary Search Tree Visualization</h3>
         <div className="tree-info">
           <p>
-            <strong>Input Numbers:</strong> {tree.numbers.join(', ')}
+            <strong>Name:</strong> {tree.name}
+          </p>
+          <p>
+            <strong>Input Numbers:</strong> {tree.values?.join(', ') || tree.numbers?.join(', ')}
           </p>
           <p>
             <strong>Created:</strong> {new Date(tree.createdAt).toLocaleString()}
@@ -191,6 +222,18 @@ const BinarySearchTree = () => {
         <div className="input-section">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
+              <label htmlFor="treeName">Tree Name:</label>
+              <input
+                type="text"
+                id="treeName"
+                value={name}
+                onChange={handleNameChange}
+                placeholder="Enter a name for your tree"
+                required
+              />
+              {nameError && <div className="field-error">{nameError}</div>}
+            </div>
+            <div className="form-group">
               <label htmlFor="numbers">Enter numbers separated by commas:</label>
               <input
                 type="text"
@@ -201,7 +244,7 @@ const BinarySearchTree = () => {
                 required
               />
             </div>
-            <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading || nameError}>
               {loading ? 'Processing...' : 'Generate Tree'}
             </button>
           </form>
@@ -224,7 +267,8 @@ const BinarySearchTree = () => {
                 {previousTrees.map((tree) => (
                   <div key={tree.id} className="tree-item" onClick={() => handleLoadTree(tree.id)}>
                     <div className="tree-item-details">
-                      <p className="tree-numbers">{tree.numbers.join(', ')}</p>
+                      <p className="tree-name">{tree.name}</p>
+                      <p className="tree-numbers">{tree.values?.join(', ') || tree.numbers?.join(', ')}</p>
                       <p className="tree-date">{new Date(tree.createdAt).toLocaleString()}</p>
                       {tree.isBalanced && <span className="balanced-badge">Balanced</span>}
                     </div>
