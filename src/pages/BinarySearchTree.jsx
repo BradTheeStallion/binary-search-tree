@@ -174,6 +174,39 @@ const BinarySearchTree = () => {
     }
   };
 
+  const simplifyTree = (node) => {
+    if (!node) return null;
+    
+    const simplified = {
+      value: node.value
+    };
+    
+    if (node.left) {
+      simplified.left = simplifyTree(node.left);
+    } else {
+      simplified.left = null;
+    }
+    
+    if (node.right) {
+      simplified.right = simplifyTree(node.right);
+    } else {
+      simplified.right = null;
+    }
+    
+    return simplified;
+  };
+
+  const getSimplifiedTreeData = (tree) => {
+    if (!tree) return null;
+    
+    return {
+      nodeCount: tree.nodeCount,
+      height: tree.height,
+      isBalanced: tree.isBalanced,
+      rootNode: simplifyTree(tree.rootNode)
+    };
+  };
+
   return (
     <div className="bst-container">
       <h2>Binary Search Tree Generator</h2>
@@ -226,9 +259,31 @@ const BinarySearchTree = () => {
           {currentTree && !loading && (
             <div className="tree-json-output">
               <h3>Current Tree Data (JSON)</h3>
+              
+              <div className="tree-summary">
+                <div>
+                  <strong>ID:</strong> {currentTree.id}
+                </div>
+                <div>
+                  <strong>Name:</strong> {currentTree.name}
+                </div>
+                <div>
+                  <strong>Original Inputs:</strong> {currentTree.originalInputs.join(', ')}
+                </div>
+                <div>
+                  <strong>Nodes:</strong> {currentTree.nodeCount}
+                </div>
+                <div>
+                  <strong>Height:</strong> {currentTree.height}
+                </div>
+                <div>
+                  <strong>Balanced:</strong> {currentTree.isBalanced ? 'true' : 'false'}
+                </div>
+              </div>
+              
               <pre>
                 <code>
-                  {JSON.stringify(currentTree, null, 2)}
+                  {JSON.stringify(getSimplifiedTreeData(currentTree), null, 2)}
                 </code>
               </pre>
             </div>
