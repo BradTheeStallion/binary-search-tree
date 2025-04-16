@@ -1,6 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const renderTree = (node, prefix = '', isLeft = true) => {
+  if (!node) return [];
+  let lines = [];
+  if (node.right) {
+    const newPrefix = prefix + (isLeft ? '│   ' : '    ');
+    lines = lines.concat(renderTree(node.right, newPrefix, false));
+  }
+  lines.push(prefix + (isLeft ? '└── ' : '┌── ') + node.value);
+  if (node.left) {
+    const newPrefix = prefix + (isLeft ? '    ' : '│   ');
+    lines = lines.concat(renderTree(node.left, newPrefix, true));
+  }
+  return lines;
+};
+
+const TreeDisplay = ({ rootNode }) => {
+  const lines = renderTree(rootNode);
+  return (
+    <pre style={{ fontFamily: 'monospace', lineHeight: '1.5em' }}>
+      {lines.join('\n')}
+    </pre>
+  );
+};
+
 const BinarySearchTree = () => {
   const [name, setName] = useState('');
   const [numbers, setNumbers] = useState('');
@@ -223,15 +247,23 @@ const BinarySearchTree = () => {
 
           {loading && currentTree && <div className="loading-spinner">Loading Tree...</div>}
 
-          {/* Display JSON instead of SVG visualization */}
           {currentTree && !loading && (
-            <div className="tree-json-output">
-              <h3>Current Tree Data (JSON)</h3>
-              <pre>
-                <code>
-                  {JSON.stringify(currentTree, null, 2)}
-                </code>
-              </pre>
+            <div className="tree-output-container">
+              {/* Added Tree Visual Display */}
+              <div className="tree-visual-output">
+                <h3>Tree Visualization</h3>
+                {currentTree.root && <TreeDisplay rootNode={currentTree.root} />}
+              </div>
+              
+              {/* Original JSON Display */}
+              <div className="tree-json-output">
+                <h3>Tree Data (JSON)</h3>
+                <pre>
+                  <code>
+                    {JSON.stringify(currentTree, null, 2)}
+                  </code>
+                </pre>
+              </div>
             </div>
           )}
         </div>
