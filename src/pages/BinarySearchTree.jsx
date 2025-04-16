@@ -16,11 +16,18 @@ const renderTree = (node, prefix = '', isLeft = true) => {
   return lines;
 };
 
-const TreeDisplay = ({ rootNode }) => {
-  const lines = renderTree(rootNode);
+const TreeDisplay = ({ treeData }) => {
+  if (!treeData || !treeData.root) {
+    return <p>No tree data available for visualization.</p>;
+  }
+
+  console.log("Tree data structure:", treeData);
+  
+  const lines = renderTree(treeData.root);
+  
   return (
     <pre style={{ fontFamily: 'monospace', lineHeight: '1.5em' }}>
-      {lines.join('\n')}
+      {lines.length > 0 ? lines.join('\n') : 'Unable to visualize tree structure.'}
     </pre>
   );
 };
@@ -249,13 +256,11 @@ const BinarySearchTree = () => {
 
           {currentTree && !loading && (
             <div className="tree-output-container">
-              {/* Added Tree Visual Display */}
               <div className="tree-visual-output">
                 <h3>Tree Visualization</h3>
-                {currentTree.root && <TreeDisplay rootNode={currentTree.root} />}
+                <TreeDisplay treeData={currentTree} />
               </div>
               
-              {/* Original JSON Display */}
               <div className="tree-json-output">
                 <h3>Tree Data (JSON)</h3>
                 <pre>
