@@ -1,50 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const renderTree = (node, prefix = '', isLast = true) => {
-  if (!node) return [];
-  
-  const lines = [];
-  lines.push(prefix + (isLast ? '└── ' : '┌── ') + node.value);
-  
-  const childPrefix = prefix + (isLast ? '    ' : '│   ');
-  
-  if (node.left || node.right) {
-    if (node.right) {
-      lines.push(...renderTree(node.right, childPrefix, !node.left));
-    }
-    
-    if (node.left) {
-      lines.push(...renderTree(node.left, childPrefix, true));
-    }
-  }
-  
-  return lines;
-};
-
-const TreeDisplay = ({ treeData }) => {
-  if (!treeData || !treeData.rootNode) {
-    return <p>No tree data available for visualization.</p>;
-  }
-  
-  const rootValue = treeData.rootNode.value;
-  const lines = [`${rootValue}`];
-  
-  const childPrefix = '';
-  if (treeData.rootNode.right) {
-    lines.push(...renderTree(treeData.rootNode.right, childPrefix, !treeData.rootNode.left).map(line => '    ' + line));
-  }
-  if (treeData.rootNode.left) {
-    lines.push(...renderTree(treeData.rootNode.left, childPrefix, true).map(line => '    ' + line));
-  }
-  
-  return (
-    <pre style={{ fontFamily: 'monospace', lineHeight: '1.5em' }}>
-      {lines.length > 0 ? lines.join('\n') : 'Unable to visualize tree structure.'}
-    </pre>
-  );
-};
-
 const BinarySearchTree = () => {
   const [name, setName] = useState('');
   const [numbers, setNumbers] = useState('');
@@ -268,20 +224,13 @@ const BinarySearchTree = () => {
           {loading && currentTree && <div className="loading-spinner">Loading Tree...</div>}
 
           {currentTree && !loading && (
-            <div className="tree-output-container">
-              <div className="tree-visual-output">
-                <h3>Tree Visualization</h3>
-                <TreeDisplay treeData={currentTree} />
-              </div>
-              
-              <div className="tree-json-output">
-                <h3>Tree Data (JSON)</h3>
-                <pre>
-                  <code>
-                    {JSON.stringify(currentTree, null, 2)}
-                  </code>
-                </pre>
-              </div>
+            <div className="tree-json-output">
+              <h3>Current Tree Data (JSON)</h3>
+              <pre>
+                <code>
+                  {JSON.stringify(currentTree, null, 2)}
+                </code>
+              </pre>
             </div>
           )}
         </div>
