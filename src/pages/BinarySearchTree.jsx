@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const renderTree = (node, prefix = '', isLeft = true) => {
+const renderTree = (node, prefix = '', isLast = true) => {
   if (!node) return [];
-  let lines = [];
-  if (node.right) {
-    const newPrefix = prefix + (isLeft ? '│   ' : '    ');
-    lines = lines.concat(renderTree(node.right, newPrefix, false));
+  
+  const lines = [];
+  lines.push(prefix + (isLast ? '└── ' : '┌── ') + node.value);
+  
+  const childPrefix = prefix + (isLast ? '    ' : '│   ');
+  
+  if (node.left || node.right) {
+    if (node.right) {
+      lines.push(...renderTree(node.right, childPrefix, !node.left));
+    }
+    
+    if (node.left) {
+      lines.push(...renderTree(node.left, childPrefix, true));
+    }
   }
-  lines.push(prefix + (isLeft ? '└── ' : '┌── ') + node.value);
-  if (node.left) {
-    const newPrefix = prefix + (isLeft ? '    ' : '│   ');
-    lines = lines.concat(renderTree(node.left, newPrefix, true));
-  }
+  
   return lines;
 };
 
@@ -21,7 +27,16 @@ const TreeDisplay = ({ treeData }) => {
     return <p>No tree data available for visualization.</p>;
   }
   
-  const lines = renderTree(treeData.rootNode);
+  const rootValue = treeData.rootNode.value;
+  const lines = [`${rootValue}`];
+  
+  const childPrefix = '';
+  if (treeData.rootNode.right) {
+    lines.push(...renderTree(treeData.rootNode.right, childPrefix, !treeData.rootNode.left).map(line => '    ' + line));
+  }
+  if (treeData.rootNode.left) {
+    lines.push(...renderTree(treeData.rootNode.left, childPrefix, true).map(line => '    ' + line));
+  }
   
   return (
     <pre style={{ fontFamily: 'monospace', lineHeight: '1.5em' }}>
