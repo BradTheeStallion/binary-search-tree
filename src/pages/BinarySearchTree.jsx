@@ -15,8 +15,6 @@ const BinarySearchTree = () => {
 
   const API_URL = process.env.REACT_APP_API_BASE_URL || '/api/trees';
   const PAGE_SIZE = 5;
-  const SVG_WIDTH = 800;
-  const SVG_HEIGHT = 500;
 
   useEffect(() => {
     if (showPrevious) {
@@ -176,73 +174,6 @@ const BinarySearchTree = () => {
     }
   };
 
-  const renderTreeNode = (node, x, y, level = 0, parentX = null, parentY = null, maxWidth = SVG_WIDTH) => {
-    if (!node) return null;
-
-    const nodeSize = 36;
-    const verticalSpacing = 70;
-    const horizontalScaleFactor = 0.6;
-    const baseHorizontalOffset = maxWidth / Math.pow(2, level + 1);
-    const horizontalOffset = baseHorizontalOffset * Math.pow(horizontalScaleFactor, level);
-
-    const nodeKey = node.id ?? `${node.value}-${x}-${y}`;
-
-    return (
-      <g key={nodeKey}>
-        {parentX !== null && parentY !== null && (
-           <line
-             x1={parentX}
-             y1={parentY + nodeSize / 2}
-             x2={x}
-             y2={y - nodeSize / 2}
-             className="tree-edge"
-           />
-         )}
-        <circle cx={x} cy={y} r={nodeSize / 2} className="tree-node" />
-        <text x={x} y={y} textAnchor="middle" dominantBaseline="middle" className="node-text">
-          {node.value !== undefined ? node.value : node.val}
-        </text>
-
-        {node.left && renderTreeNode(node.left, x - horizontalOffset, y + verticalSpacing, level + 1, x, y, maxWidth)}
-        {node.right && renderTreeNode(node.right, x + horizontalOffset, y + verticalSpacing, level + 1, x, y, maxWidth)}
-      </g>
-    );
-  };
-
-  const renderTree = (tree) => {
-    if (!tree || !tree.rootNode) return null;
-
-    const treeDepth = tree.height !== undefined ? tree.height : (tree.rootNode ? 1 : 0);
-    const requiredHeight = Math.max(SVG_HEIGHT, (treeDepth + 1) * 80 + 50);
-    const requiredWidth = SVG_WIDTH;
-
-    return (
-      <div className="tree-visualization">
-        <h3>Binary Search Tree Visualization</h3>
-        <div className="tree-info">
-          <p>
-            <strong>Name:</strong> {tree.name}
-          </p>
-          <p>
-            <strong>Input Numbers:</strong> {tree.originalInputs?.join(', ')}
-          </p>
-          <p>
-            <strong>Created:</strong> {new Date(tree.createdAt).toLocaleString()}
-          </p>
-          {tree.isBalanced !== null && (
-             <p className={tree.isBalanced ? 'balanced-note' : 'unbalanced-note'}>
-                This tree is {tree.isBalanced ? 'balanced' : 'unbalanced'}
-             </p>
-           )}
-           <p>Nodes: {tree.nodeCount ?? 'N/A'}, Height: {tree.height ?? 'N/A'}</p>
-        </div>
-        <svg width={requiredWidth} height={requiredHeight} viewBox={`0 0 ${requiredWidth} ${requiredHeight}`}>
-          {renderTreeNode(tree.rootNode, requiredWidth / 2, 40)}
-        </svg>
-      </div>
-    );
-  };
-
   return (
     <div className="bst-container">
       <h2>Binary Search Tree Generator</h2>
@@ -291,7 +222,18 @@ const BinarySearchTree = () => {
           </form>
 
           {loading && currentTree && <div className="loading-spinner">Loading Tree...</div>}
-          {currentTree && !loading && renderTree(currentTree)}
+
+          {/* Display JSON instead of SVG visualization */}
+          {currentTree && !loading && (
+            <div className="tree-json-output">
+              <h3>Current Tree Data (JSON)</h3>
+              <pre>
+                <code>
+                  {JSON.stringify(currentTree, null, 2)}
+                </code>
+              </pre>
+            </div>
+          )}
         </div>
       ) : (
         <div className="previous-trees-section">
